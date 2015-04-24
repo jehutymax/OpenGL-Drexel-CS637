@@ -1,12 +1,12 @@
-include "Angel.h"
-#include <vector>
+
+#include "Angel.h"
 
 vec3 colors[747];
 vec2 vertices[747];
 float circleRadius = 0.5;
 bool circleUp = true;
 bool animate = false;
-int window = 0;
+int window = 1;
 
 void createSquare(vec2* verticeList, vec3* colorList, vec2 center, vec3 color, float size, int index)
 {
@@ -114,8 +114,19 @@ void init( void )
 
 //----------------------------------------------------------------------------
 
+void displayWindow2(void)
+{
+
+    glClear( GL_COLOR_BUFFER_BIT );     // clear the window
+    glDrawArrays( GL_TRIANGLES, 0, 3 );    // draw the 1st triangle
+    glDrawArrays( GL_TRIANGLE_FAN, 3, 360); // Circle!
+
+    glutSwapBuffers();     	
+}
+
 void display( void )
 {
+    glutSetWindow(1);
     glClear( GL_COLOR_BUFFER_BIT );     // clear the window
 
     for (int i = 0; i < 6; ++i)
@@ -123,17 +134,11 @@ void display( void )
         glDrawArrays( GL_TRIANGLE_STRIP, 723 + (4 * i), 4); // SquareN
     }
     
-    glutSwapBuffers();
+    glutSwapBuffers();    	
+
 }
 
-void displayWindow2(void)
-{
-    glClear( GL_COLOR_BUFFER_BIT );     // clear the window
-    glDrawArrays( GL_TRIANGLES, 0, 3 );    // draw the 1st triangle
-    glDrawArrays( GL_TRIANGLE_FAN, 3, 360); // Circle!
 
-    glutSwapBuffers();
-}
 
 void displaySubWindow( void )
 {   
@@ -286,11 +291,15 @@ void keyboard_window2(unsigned char key, int x, int y)
 void idle()
 {
     if (animate)
-    {
-        int current = (++window % 2) + 1;
-        glutSetWindow(current);
+    {	
+	glutSetWindow(window);
 
-         mat4 ctm = Translate(0, -0.3, 0) * RotateZ(2.0) * Translate(0, 0.3, 0);
+	if (window == 1) 
+		window = 4;
+	else window = 1;
+
+         mat4 ctm = Translate(0, -0.3, 0) * RotateZ(0.7) * Translate(0, 0.3, 0);
+
 
         for (int i = 723; i < 747; ++i)
         {
@@ -299,7 +308,7 @@ void idle()
             vertices[i] = vec2(newPoint[0], newPoint[1]);
         }
 
-        ctm = Translate(-0.5, -0.1, 0) * RotateZ(-3.0) * Translate(0.5, 0.1, 0);
+        ctm = Translate(-0.5, -0.1, 0) * RotateZ(-0.4) * Translate(0.5, 0.1, 0);
 
         for (int i = 0; i < 3; ++i)
         {
@@ -315,9 +324,9 @@ void idle()
             circleUp = true;
      
         if (circleUp)
-            circleRadius += 0.01;
+            circleRadius += 0.001;
         else
-            circleRadius -= 0.01;
+            circleRadius -= 0.001;
         
         float radius = circleRadius;
         float angleInc = 1.0;
@@ -345,6 +354,8 @@ void idle()
 int
 main( int argc, char **argv )
 {
+
+
     std::cout << "CS637 HW3:" << std::endl;
     std::cout << "    About: application displays 2d objects." << std::endl;
     std::cout << "    Usage: Press 'Esc' or 'Enter' to exit. " << std::endl;
@@ -354,16 +365,16 @@ main( int argc, char **argv )
     glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize( 500, 500 );
 
-    glewExperimental=GL_TRUE; 
-    glewInit();    
+  
     
 
  
     int win = glutCreateWindow("ICG: Assignment 3");
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
-    glutMouseFunc(myMouse);
-    init();
+    glewExperimental=GL_TRUE; 
+    glewInit();     
+  init();
 
     int sub_menu = glutCreateMenu(submenu);
     glutAddMenuEntry("white", 1);
@@ -380,10 +391,15 @@ main( int argc, char **argv )
     int win2 = glutCreateWindow("window 2");
     glutDisplayFunc(displayWindow2);
     glutKeyboardFunc(keyboard_window2);
+    glewExperimental=GL_TRUE; 
+    glewInit(); 
     init();
-   
+   std::cout << win << std::endl;
+   std::cout << win2 << std::endl;
     glutCreateSubWindow(win, 0, 0, 200, 200);
     glutDisplayFunc(displaySubWindow);
+    glewExperimental=GL_TRUE; 
+    glewInit(); 
     init();
     glClearColor( 1.0, 1.0, 1.0, 1.0 );
 
@@ -396,7 +412,6 @@ main( int argc, char **argv )
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
    glutIdleFunc(idle);
-
 
     glutMainLoop();
     return 0;
