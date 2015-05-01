@@ -1,5 +1,5 @@
 
-====== CS637 Assignment 3 ======
+====== CS637 Assignment 4 ======
 
 Rafael Campos - 13890411
 rcc62@drexel.edu
@@ -8,7 +8,7 @@ rcc62@drexel.edu
 APPLICATION
 -------------------------------
 As per the assignment specifications, the application:
- - Displays 2D objects: sequence of squares, circle, ellipse and triangle.
+ - Displays a 3d cube that can be rotated, translated and scaled by the user.
 
 
 
@@ -20,6 +20,17 @@ In order to compile it, the instruction -stdlib=libstdc++  had to be added to th
 The changes done to red_triangle.cpp had to be re-applied to the tux version of the source code since there were too many differences. The file was renamed to shapes.cpp.
 
 
+HOW TO USE
+-------------------------------
+The information below is out printed to the console when executing the application.
+
+ Right-click anywhere on the window to select a transformation. 
+	 = / - 	 Increase / Decrease the delta for the selected transformation.
+	 a / z 	 Apply / Inverse Apply the current transformation on the X axis.
+	 s / x 	 Apply / Inverse Apply the current transformation on the Y axis.
+	 d / c 	 Apply / Inverse Apply the current transformation on the Z axis.
+	 r 	 Reset all values.
+ Press either 'Esc' or 'Enter' to exit. 
 
 HOW TO COMPILE
 -------------------------------
