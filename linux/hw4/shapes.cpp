@@ -13,7 +13,6 @@ const int NumVertices = 36; //(6 faces)(2 triangles/face)
 point4 points[NumVertices];
 color4 colors[NumVertices];
 
-mat4 N = Ortho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
 mat4 ctm;
 GLuint transformationMatrix;
 
@@ -122,14 +121,16 @@ void init( void )
     // Initialize the vertex position attribute from the vertex shader
     GLuint vPosition = glGetAttribLocation( program, "vPosition" );
     glEnableVertexAttribArray( vPosition );
-    glVertexAttribPointer( vPosition, 2, GL_FLOAT, GL_FALSE, 0,
+    glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,
                            BUFFER_OFFSET(0) );
 
     // Initialize color
     GLuint vColor = glGetAttribLocation( program, "vColor" );
     glEnableVertexAttribArray( vColor );
-    glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,
+    glVertexAttribPointer( vColor, 4, GL_FLOAT, GL_FALSE, 0,
                            BUFFER_OFFSET(sizeof(points)) );
+
+    transformationMatrix = glGetUniformLocation(program, "ctm");
 
     glEnable(GL_DEPTH_TEST);
 
