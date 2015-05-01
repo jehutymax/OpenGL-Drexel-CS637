@@ -3,70 +3,84 @@
 #include "Angel.h"
 #include <vector>
 
-vec3 colors[747];
-vec2 vertices[747];
+std::vector<vec2> vertices;
+std::vector<vec3> colors;
 float circleRadius = 0.5;
 bool circleUp = true;
 bool animate = false;
 int window = 0;
-
-void createSquare(vec2* verticeList, vec3* colorList, vec2 center, vec3 color, float size, int index)
+std::vector<int> circleIndices;
+    
+void createSquare(vec2 center, vec3 color, float size, int index)
 {
     vec2 firstPoint = vec2(center[0] - size/2.0, center[1] - size/2.0);
-    verticeList[index] = firstPoint;
-    colorList[index] = color;
+    
+    if (index < 0)
+    {
+        vertices.push_back(firstPoint);
+        vertices.push_back(vec2(firstPoint[0], firstPoint[1] + size));  
+        vertices.push_back(vec2(firstPoint[0] + size, firstPoint[1])); 
+        vertices.push_back(vec2(firstPoint[0] + size, firstPoint[1] + size));  
 
-    verticeList[++index] = vec2(firstPoint[0], firstPoint[1] + size);  colorList[index] = color;
+        for (int i = 0; i < 4; i++)
+            colors.push_back(color);
+    }
+    else
+    {
+        vertices[index] = firstPoint;
+        colors[index] = color;
+
+        vertices[++index] = vec2(firstPoint[0], firstPoint[1] + size);  colors[index] = color;
    
-    verticeList[++index] = vec2(firstPoint[0] + size, firstPoint[1]);  colorList[index] = color;
-    verticeList[++index] = vec2(firstPoint[0] + size, firstPoint[1] + size);  colorList[index] = color; 
+        vertices[++index] = vec2(firstPoint[0] + size, firstPoint[1]);  colors[index] = color;
+        vertices[++index] = vec2(firstPoint[0] + size, firstPoint[1] + size);  colors[index] = color; 
+    }
+
 }
 
-
-//--------------------------------------------------------------------------
 
 void init( void )
 {
     // triangle
-    colors[0] = vec3(0, 1, 0);
-    colors[1] = vec3(1, 0, 0);
-    colors[2] = vec3(0, 0, 1);
+    colors.push_back(vec3(0, 1, 0));
+    colors.push_back(vec3(1, 0, 0));
+    colors.push_back(vec3(0, 0, 1));
     
-    vertices[0] = vec2( -0.9, -0.8 );
-    vertices[1] = vec2( -0.5, 0.8 );
-    vertices[2] = vec2( -0.1, -0.8 );
+    vertices.push_back(vec2(-0.9, -0.8));
+    vertices.push_back(vec2(-0.5, 0.8));
+    vertices.push_back(vec2(-0.1, -0.8));
 
     // Circle
     float radius = 0.5;
     float angleInc = 1.0;
     angleInc *= M_PI / 180.0; // M_PI is defined in Angel.h
     float currentAngle = 0.0;
-    for (int i = 3; i < 363; i++)
+    for (int i = 0; i < 360; i++)
     {
         vec2 vertice = vec2( (150.0/400.0) * radius * cos(currentAngle) + 0.4,
              radius * sin(currentAngle));
-        
-        vertices[i] = vertice;
-
         vec3 color = vec3(currentAngle/6 * 1.0, 0, 0);
-        colors[i] = color;
+        
+        vertices.push_back(vertice);
+        colors.push_back(color);
 
         currentAngle += angleInc;
     }
 
    // Ellipse
     radius = 0.92;
-    angleInc = 360.0 / 360.0;
+    angleInc = 1.0;
     angleInc *= M_PI / 180.0; // M_PI is defined in Angel.h
     currentAngle = 0.0;
-    for (int i = 363; i < 723; i++)
+    for (int i = 0; i < 360; i++)
     {
         vec2 vertice = vec2(radius * cos(currentAngle),
              0.6*(radius * sin(currentAngle)));
-        vertices[i] = vertice;
-
         vec3 color = vec3(currentAngle/6 * 1.0, currentAngle/6 * 0.5, 0);
-        colors[i] = color;
+
+        vertices.push_back(vertice);
+        colors.push_back(color);
+
         currentAngle += angleInc;
     }
 
@@ -76,12 +90,10 @@ void init( void )
         vec2 squareCenter = vec2(0.0, -0.3);
         vec3 squareColor = vec3(c * 1.0, c * 1.0, c * 1.0);
 
-        createSquare(vertices, colors, squareCenter, squareColor, 
-            1.2 - (0.2 * i), 723 + (4 * i));
+        createSquare(squareCenter, squareColor, 
+            1.2 - (0.2 * i), -1);
     }
        
-
-
     // Create a vertex array object
     GLuint vao[1];
     glGenVertexArraysAPPLE( 1, vao );
@@ -91,10 +103,10 @@ void init( void )
     GLuint buffer;
     glGenBuffers( 1, &buffer );
     glBindBuffer( GL_ARRAY_BUFFER, buffer );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(colors), NULL, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, (vertices.size() * sizeof(vec2)) + (colors.size() * sizeof(vec3)), NULL, GL_STATIC_DRAW );
 
-    glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-    glBufferSubData( GL_ARRAY_BUFFER, sizeof(vertices), sizeof(colors), colors);
+    glBufferSubData( GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(vec2), &vertices[0]);
+    glBufferSubData( GL_ARRAY_BUFFER, vertices.size() * sizeof(vec2), colors.size() * sizeof(vec3), &colors[0]);
 
     // Load shaders and use the resulting shader program
     GLuint program = InitShader( "vshader21.glsl", "fshader21.glsl" );
@@ -110,7 +122,7 @@ void init( void )
     GLuint vColor = glGetAttribLocation( program, "vColor" );
     glEnableVertexAttribArray( vColor );
     glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,
-                           BUFFER_OFFSET(sizeof(vertices)) );
+                            BUFFER_OFFSET(vertices.size() * sizeof(vec2)) );
 
     glClearColor( 0, 0, 0, 1.0 ); // black background
 
@@ -126,7 +138,15 @@ void display( void )
     {
         glDrawArrays( GL_TRIANGLE_STRIP, 723 + (4 * i), 4); // SquareN
     }
-    
+
+    std::cout << "circle index: size:: " << circleIndices.size() << std::endl;
+/*
+    for (int i = 0; i < circleIndices.size(); i++)
+    {
+         glDrawArrays( GL_TRIANGLE_FAN, circleIndices[i], 360);
+         std::cout << "circle index: index:: " << circleIndices[i] << std::endl;
+    }
+  */  
     glutSwapBuffers();
 }
 
@@ -156,11 +176,11 @@ void setSquareFillColor(float r, float g, float b)
         vec2 squareCenter = vec2(0.0, -0.3);
         vec3 squareColor = vec3(c * r, c * g, c * b);
 
-        createSquare(vertices, colors, squareCenter, squareColor, 
+        createSquare(squareCenter, squareColor, 
             1.2 - (0.2 * i), 723 + (4 * i));
     }
 
-    glBufferSubData( GL_ARRAY_BUFFER, sizeof(vertices), sizeof(colors), colors);
+    glBufferSubData( GL_ARRAY_BUFFER, vertices.size() * sizeof(vec2), colors.size() * sizeof(vec3), &colors[0]);
 }
 
 void window_menu(int id)
@@ -221,7 +241,7 @@ void subwindow_menu(int id)
         case 4:
         glClearColor(0.2, 0.1, 1.0, 1.0 );
         break;
-        case 5:
+        case 5: 
         glClearColor( 0, 1.0, 0, 1.0 );
         break;
     }
@@ -229,10 +249,8 @@ void subwindow_menu(int id)
     glutPostRedisplay();
 }
 
-//----------------------------------------------------------------------------
 
-void
-keyboard( unsigned char key, int x, int y )
+void keyboard( unsigned char key, int x, int y )
 {
     switch ( key ) {
     case 033: // esc
@@ -244,12 +262,13 @@ keyboard( unsigned char key, int x, int y )
 
 void setWindow2FillColor(float r, float g, float b)
 {
+    glutSetWindow(2);
     for (int i = 0; i <  363; i++)
     {
         colors[i] = vec3(r, g, b);
     }
 
-    glBufferSubData( GL_ARRAY_BUFFER, sizeof(vertices), sizeof(colors), colors);
+    glBufferSubData( GL_ARRAY_BUFFER, vertices.size() * sizeof(vec2), colors.size() * sizeof(vec3), &colors[0]);
 
 }
 
@@ -292,7 +311,7 @@ void idle()
     if (animate)
     {
         int current = (++window % 2) + 1;
-        glutSetWindow(current);
+        glutSetWindow(1);
 
          mat4 ctm = Translate(0, -0.3, 0) * RotateZ(2.0) * Translate(0, 0.3, 0);
 
@@ -340,10 +359,45 @@ void idle()
             currentAngle += angleInc;
         }
 
-        glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+        glBufferSubData( GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(vec2), &vertices[0]);
 
         glutPostRedisplay();
     }
+}
+
+void myMouse(int button, int state, int x, int y)
+{
+
+     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+     {        
+        circleIndices.push_back(vertices.size());
+
+        float X = ((x/500.0) - 0.5) * 2;
+        float Y = ((y/500.0) - 0.5) * 2;
+
+        float radius = 0.4;
+        float angleInc = 1.0;
+        angleInc *= M_PI / 180.0; // M_PI is defined in Angel.h
+        float currentAngle = 0.0;
+        for (int i = 0; i < 360; i++)
+        {
+            vec2 vertice = vec2(radius * cos(currentAngle) + x,
+                 radius * sin(currentAngle) + y);
+            
+            vertices.push_back(vertice);
+
+            vec3 color = vec3(currentAngle/6 * 1.0, 0, 0);
+            colors.push_back(color);
+
+            currentAngle += angleInc;
+        }
+
+        glBufferSubData( GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(vec2), &vertices[0]);
+        glBufferSubData( GL_ARRAY_BUFFER, vertices.size() * sizeof(vec2), colors.size() * sizeof(vec3), &colors[0]);
+
+        glutPostRedisplay();
+     }
+               
 }
 
 //----------------------------------------------------------------------------
@@ -362,6 +416,7 @@ int main( int argc, char **argv )
     int win = glutCreateWindow("ICG: Assignment 3");
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
+    //glutMouseFunc(myMouse);
     init();
 
     int sub_menu = glutCreateMenu(submenu);
@@ -394,7 +449,7 @@ int main( int argc, char **argv )
     glutAddMenuEntry("green", 5);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
-   glutIdleFunc(idle);
+    glutIdleFunc(idle);
 
     glutMainLoop();
     return 0;
