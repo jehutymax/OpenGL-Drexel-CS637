@@ -4,7 +4,8 @@ OPTIONS=$(GCC_OPTIONS) $(GL_OPTIONS)
 
 
 all: 
-	g++ shapes.cpp Common/InitShader.o $(OPTIONS) -o shapes 
+	g++ SMF.cpp $(OPTIONS) -c
+	g++ shapes.cpp Common/InitShader.o SMF.o $(OPTIONS) -o icg_hw5 
 
 clean:
-	rm -f *.o shapes
+	rm -f *.o icg_hw5

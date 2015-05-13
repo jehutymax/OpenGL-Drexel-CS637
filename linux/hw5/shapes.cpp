@@ -4,6 +4,7 @@
 #include <string>
 #include <iomanip>
 #include <iostream>
+#include <cstring>
 
 
 typedef Angel::vec4  color4;
@@ -184,7 +185,10 @@ void loadObjectModel(SMF smfFile)
         );
 }
 
-
+void idle()
+{
+	glutPostRedisplay();
+}
 
 void display( void )
 {
