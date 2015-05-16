@@ -4,6 +4,7 @@
 #include <string>
 #include <iomanip>
 #include <iostream>
+#include <cstring>
 
 typedef Angel::vec4  color4;
 typedef Angel::vec4  point4;
