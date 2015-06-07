@@ -4,8 +4,7 @@ OPTIONS=$(GCC_OPTIONS) $(GL_OPTIONS)
 
 
 all: 
-	g++ SMF.cpp $(OPTIONS) -c
-	g++ shapes.cpp Common/InitShader.o SMF.o $(OPTIONS) -o icg_hw9_2d 
+	g++ robot_arm.cpp Common/InitShader.o $(OPTIONS) -o robot_arm 
 
 clean:
-	rm -f *.o icg_hw9_2d
+	rm -f *.o robot_arm
