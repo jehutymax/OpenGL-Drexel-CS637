@@ -414,8 +414,8 @@ void init( void )
 {
     // Create a vertex array object
     GLuint vao[1];
-    glGenVertexArraysAPPLE( 1, vao );
-    glBindVertexArrayAPPLE( vao[0] );
+    glGenVertexArrays( 1, vao );
+    glBindVertexArray( vao[0] );
 
     // Load shaders and use the resulting shader program
     Properties.graphics_program.program = myInitShader( "vPhongShader.glsl", "fPhongShader.glsl",
@@ -546,7 +546,8 @@ void graphicsInitialization(int argc, char **argv)
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
     init();
-
+    glewExperimental=GL_TRUE; 
+    glewInit(); 
     glutIdleFunc(idle);
 }
 
