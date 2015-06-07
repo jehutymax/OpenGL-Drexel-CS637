@@ -546,9 +546,9 @@ void graphicsInitialization(int argc, char **argv)
     int win = glutCreateWindow("ICG: Assignment 5");
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
-    init();
     glewExperimental=GL_TRUE; 
     glewInit(); 
+    init();
     glutIdleFunc(idle);
 }
 

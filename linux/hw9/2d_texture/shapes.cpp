@@ -400,14 +400,15 @@ int main( int argc, char *argv[] )
     glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE );
     glutInitWindowSize( 800, 600 );
     glutCreateWindow( "patch" );
+    glewExperimental=GL_TRUE; 
+    glewInit(); 
 
     init();
 
     glutDisplayFunc( display );
     glutReshapeFunc( reshape );
     glutKeyboardFunc( keyboard );
-    glewExperimental=GL_TRUE; 
-    glewInit(); 
+
 
     printHelp();    
 
