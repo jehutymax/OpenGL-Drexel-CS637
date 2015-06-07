@@ -1,5 +1,6 @@
 // CS637 HW6 - Shapes.cpp
 
+#include <cstring>
 #include "SMF.h"
 #include <string>
 #include <iomanip>
