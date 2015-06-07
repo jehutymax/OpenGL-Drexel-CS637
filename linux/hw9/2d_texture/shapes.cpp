@@ -1,4 +1,4 @@
-
+#include <cstring>
 #include <algorithm>
 #include "SMF.h"
 
